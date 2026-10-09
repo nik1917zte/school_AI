@@ -1,3 +1,7 @@
+process.on('unhandledRejection', e => console.error('UNHANDLED', e));
+process.on('uncaughtException', e => { console.error('UNCAUGHT', e); process.exit(1); });
+process.on('exit', c => console.log('process exiting with code', c));
+
 // server.js
 require('dotenv').config();
 const express = require('express');
