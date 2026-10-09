@@ -2,7 +2,7 @@
   "name": "mektebai",
   "version": "1.0.0",
   "scripts": {
-    "start": "node server.js",
+    "start": "node seed.js && node server.js",
     "seed": "node seed.js"
   },
   "dependencies": {
