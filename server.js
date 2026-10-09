@@ -181,6 +181,7 @@ app.post('/api/chat', auth, only('parent'), async (req, res) => {
     let out;
     try { out = JSON.parse(raw.match(/\{[\s\S]*\}/)[0]); }
     catch { out = { reply: raw, error_type: 'none', solved: false }; }
+    //24.place
     if (!['none', 'concept', 'calculation', 'gap'].includes(out.error_type)) out.error_type = 'none';
     db.prepare('INSERT INTO attempts(child_id,topic,error_type,solved) VALUES(?,?,?,?)')
       .run(c.id, topic, out.error_type, out.solved ? 1 : 0);
