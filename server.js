@@ -1,3 +1,4 @@
+
 // server.js
 require('./seed'); // Server hər dəfə işə düşəndə demo datanı yoxlayır və əskikləri tamamlayır
 require('dotenv').config();
