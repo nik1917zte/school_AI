@@ -1,6 +1,15 @@
+
+
+const path = require('path');
 const Database = require('better-sqlite3');
 const crypto = require('crypto');
-const db = new Database('mektebai.db');
+
+const dbPath = process.env.RAILWAY_VOLUME_MOUNT_PATH
+  ? path.join(process.env.RAILWAY_VOLUME_MOUNT_PATH, 'mektebai.db')
+  : path.join(__dirname, 'mektebai.db');
+
+const db = new Database(dbPath);
+
 db.pragma('foreign_keys = ON');
 db.pragma('journal_mode = WAL');
 
