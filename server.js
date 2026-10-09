@@ -1,3 +1,5 @@
+// server.js
+require('./seed'); // Server hər dəfə işə düşəndə demo datanı yoxlayır və əskikləri tamamlayır
 require('dotenv').config();
 const express = require('express');
 const { db, hashPw, crypto } = require('./db');
