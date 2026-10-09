@@ -1,9 +1,14 @@
-
 // server.js
-require('./seed'); // Server hər dəfə işə düşəndə demo datanı yoxlayır və əskikləri tamamlayır
 require('dotenv').config();
 const express = require('express');
 const { db, hashPw, crypto } = require('./db');
+
+// Server başlamazdan əvvəl seed-i təhlükəsiz şəkildə işlədirik
+try {
+  require('./seed');
+} catch (err) {
+  console.log('Seed icra olunarkən xəbərdarlıq:', err.message);
+}
 
 const app = express();
 app.use(express.json());
@@ -13,11 +18,11 @@ const BASE = process.env.BASE_URL || 'https://api.openai.com/v1';
 const KEY = process.env.API_KEY || process.env.OPENAI_API_KEY;
 const MODELS = (process.env.MODELS || process.env.MODEL || 'gpt-4o')
   .split(',').map(s => s.trim()).filter(Boolean);
-const cooldown = {}; // problemli modeli bir müddət atlamaq üçün
+const cooldown = {};
 
 async function claude(system, messages, max = 700, json = false) {
   let list = MODELS.filter(m => !(cooldown[m] > Date.now()));
-  if (!list.length) list = MODELS; // hamısı gözləmədədirsə, yenə də hamısını yoxla
+  if (!list.length) list = MODELS;
   let lastErr;
   for (const model of list) {
     try {
@@ -83,9 +88,17 @@ app.post('/api/register', (req, res) => {
 });
 
 app.post('/api/login', (req, res) => {
-  const u = db.prepare('SELECT * FROM users WHERE email=?').get(req.body.email || '');
-  if (!u || hashPw(req.body.password || '', u.salt).hash !== u.hash)
+  const email = (req.body.email || '').trim();
+  const password = req.body.password || '';
+
+  const u = db.prepare('SELECT * FROM users WHERE email=?').get(email);
+  if (!u) return res.status(401).json({ error: 'E-poçt və ya şifrə səhvdir' });
+
+  // Sənin orijinal hash yoxlaman:
+  if (hashPw(password, u.salt).hash !== u.hash) {
     return res.status(401).json({ error: 'E-poçt və ya şifrə səhvdir' });
+  }
+
   res.json({ token: newSession(u.id), user: pub(u) });
 });
 
